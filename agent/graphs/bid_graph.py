@@ -73,8 +73,8 @@ def decision_node(state: BidState) -> BidState:
     return {"decision": decision, "events": _event(state, "decision")}
 
 
-def route_after_decision(state: BidState) -> Literal["pricing", "end"]:
-    return "pricing" if state["decision"].action == "bid" else "end"
+def route_after_pricing(state: BidState) -> Literal["writer", "end"]:
+    return "writer" if state["decision"].action == "bid" else "end"
 
 
 def pricing_node(state: BidState) -> BidState:
@@ -93,7 +93,7 @@ def writer_node(state: BidState) -> BidState:
             f"A relevant example is {primary.title}, where I worked with {', '.join(primary.skills[:2])}. "
             f"For this scope, I would propose ${price.recommended_bid:.0f} and provide concise handover notes.\n\nBest regards")
     proposal = ProposalDraft(id=f"draft-{uuid.uuid4().hex[:8]}", job_id=job["id"], body=body, price=price.recommended_bid,
-                             claims=[], status="drafting")
+                             claims=[], status="draft")
     return {"proposal": proposal, "events": _event(state, "writer")}
 
 
@@ -135,8 +135,8 @@ def build_bid_graph():
     graph.add_edge("analyst", "decision")
     graph.add_edge("risk", "decision")
     graph.add_edge("fit", "decision")
-    graph.add_conditional_edges("decision", route_after_decision, {"pricing": "pricing", "end": END})
-    graph.add_edge("pricing", "writer")
+    graph.add_edge("decision", "pricing")
+    graph.add_conditional_edges("pricing", route_after_pricing, {"writer": "writer", "end": END})
     graph.add_edge("writer", "verifier")
     graph.add_edge("verifier", "compliance")
     graph.add_edge("compliance", "human_approval")
