@@ -10,6 +10,10 @@ services:
         value: demo
       - key: CORS_ORIGINS
         value: https://cheemaboi.github.io
+      - key: REVIEWER_USERNAME
+        value: reviewer
+      - key: REVIEWER_PASSWORD
+        generateValue: true
   - type: web
     name: gigbid-portfolio-mcp
     runtime: docker

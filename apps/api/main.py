@@ -1,8 +1,12 @@
 from __future__ import annotations
 import json
 import os
+import base64
+import hashlib
+import hmac
+import time
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -29,6 +33,46 @@ class ApprovalRequest(BaseModel):
 
 class RejectionRequest(BaseModel):
     reason: str
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+REVIEWER_USERNAME = os.getenv("REVIEWER_USERNAME", "reviewer")
+# The local value exists solely for offline tests. Render overrides it with a generated secret.
+REVIEWER_PASSWORD = os.getenv("REVIEWER_PASSWORD", "local-demo-only")
+
+
+def _issue_token(username: str) -> str:
+    """Issue a short-lived HMAC token without persisting a password or session."""
+    payload = f"{username}:{int(time.time()) + 60 * 60 * 4}"
+    signature = hmac.new(REVIEWER_PASSWORD.encode(), payload.encode(), hashlib.sha256).hexdigest()
+    return base64.urlsafe_b64encode(f"{payload}:{signature}".encode()).decode()
+
+
+def require_reviewer(authorization: str | None = Header(default=None)) -> str:
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Reviewer sign-in required")
+    try:
+        raw = base64.urlsafe_b64decode(authorization.removeprefix("Bearer ").encode()).decode()
+        username, expiry, signature = raw.rsplit(":", 2)
+        payload = f"{username}:{expiry}"
+        expected = hmac.new(REVIEWER_PASSWORD.encode(), payload.encode(), hashlib.sha256).hexdigest()
+        valid = hmac.compare_digest(signature, expected) and username == REVIEWER_USERNAME and int(expiry) >= time.time()
+    except (ValueError, UnicodeDecodeError):
+        valid = False
+    if not valid:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Reviewer session is invalid or expired")
+    return REVIEWER_USERNAME
+
+
+@app.post("/auth/login")
+def reviewer_login(request: LoginRequest):
+    if not (hmac.compare_digest(request.username, REVIEWER_USERNAME) and hmac.compare_digest(request.password, REVIEWER_PASSWORD)):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid reviewer credentials")
+    return {"access_token": _issue_token(REVIEWER_USERNAME), "token_type": "bearer", "expires_in_seconds": 14400}
 
 
 @app.get("/health")
@@ -77,7 +121,7 @@ def get_proposal(draft_id: str):
     return DRAFTS[draft_id]
 
 @app.post("/proposals/{draft_id}/approve")
-def approve_proposal(draft_id: str, request: ApprovalRequest):
+def approve_proposal(draft_id: str, request: ApprovalRequest, reviewer: str = Depends(require_reviewer)):
     proposal = DRAFTS.get(draft_id)
     if not proposal: raise HTTPException(404, "Proposal not found")
     if proposal["status"] != "awaiting_approval": raise HTTPException(409, "Proposal is not awaiting approval")
@@ -86,15 +130,15 @@ def approve_proposal(draft_id: str, request: ApprovalRequest):
     preview = MARKETPLACE.create_proposal_draft({"job_id": job["id"], "body": proposal["body"], "connects_cost": job["connects_cost"]}, request.idempotency_key, dry_run=True)
     proposal["status"] = "approved"
     proposal["dry_run_preview"] = preview
-    AUDIT.append({"event": "approval", "draft_id": draft_id, "idempotency_key": request.idempotency_key})
+    AUDIT.append({"event": "approval", "draft_id": draft_id, "idempotency_key": request.idempotency_key, "reviewer": reviewer})
     return proposal
 
 @app.post("/proposals/{draft_id}/reject")
-def reject_proposal(draft_id: str, request: RejectionRequest):
+def reject_proposal(draft_id: str, request: RejectionRequest, reviewer: str = Depends(require_reviewer)):
     proposal = DRAFTS.get(draft_id)
     if not proposal: raise HTTPException(404, "Proposal not found")
     proposal["status"] = "rejected"; proposal["rejection_reason"] = request.reason
-    AUDIT.append({"event": "rejection", "draft_id": draft_id, "reason": request.reason})
+    AUDIT.append({"event": "rejection", "draft_id": draft_id, "reason": request.reason, "reviewer": reviewer})
     return proposal
 
 @app.get("/analytics")
