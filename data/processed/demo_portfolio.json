@@ -1,0 +1,39 @@
+[
+  {
+    "id": "case-forecast",
+    "type": "case_study",
+    "title": "Demand forecasting dashboard for a retail startup",
+    "date": "2025-05-14",
+    "skills": ["Python", "FastAPI", "PostgreSQL", "forecasting"],
+    "outcome": "won",
+    "content": "Built a FastAPI service and dashboard that consolidated weekly inventory data. The client accepted a two-week pilot and continued maintenance after handover."
+  },
+  {
+    "id": "case-rag",
+    "type": "case_study",
+    "title": "Evidence-aware document search prototype",
+    "date": "2025-09-22",
+    "skills": ["Python", "RAG", "embeddings", "evaluation"],
+    "outcome": "replied",
+    "content": "Implemented hybrid keyword and semantic retrieval with source links, simple claim checks, and a small labelled evaluation set."
+  },
+  {
+    "id": "repo-gigbid",
+    "type": "repository",
+    "title": "GigBid technical prototype",
+    "date": "2026-11-10",
+    "skills": ["React", "TypeScript", "FastAPI", "MCP"],
+    "outcome": "in_progress",
+    "content": "A multi-agent-style freelance copilot with human approval, a local simulator, typed handoffs, and portfolio evidence retrieval."
+  },
+  {
+    "id": "proposal-analytics",
+    "type": "past_proposal",
+    "title": "Analytics proposal with scoped milestones",
+    "date": "2025-07-03",
+    "skills": ["SQL", "dashboard", "stakeholder communication"],
+    "outcome": "won",
+    "content": "Used a short opening, named a relevant reporting workflow, and proposed a discovery milestone before committing to implementation detail."
+  }
+]
+

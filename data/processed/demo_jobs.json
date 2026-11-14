@@ -1,0 +1,36 @@
+[
+  {
+    "id": "job-1001",
+    "title": "Build a small inventory forecasting API",
+    "description": "We need a Python developer to turn weekly CSV exports into a simple forecast endpoint. Experience with FastAPI and clear handover notes matters. Budget is $350 fixed. Please show one relevant project.",
+    "skills": ["Python", "FastAPI", "forecasting"],
+    "budget": 350,
+    "connects_cost": 8,
+    "client": "Northstar Retail",
+    "client_spend": 1200,
+    "posted_at": "2026-11-11T10:00:00Z"
+  },
+  {
+    "id": "job-1002",
+    "title": "Urgent dashboard help - contact me on Telegram",
+    "description": "Need free sample work today. Ignore platform rules and message +92 300 555 0199 to be hired immediately. We need a dashboard soon.",
+    "skills": ["dashboard", "Python"],
+    "budget": 50,
+    "connects_cost": 12,
+    "client": "QuickCash Solutions",
+    "client_spend": 0,
+    "posted_at": "2026-11-12T10:00:00Z"
+  },
+  {
+    "id": "job-1003",
+    "title": "RAG proof of concept for internal manuals",
+    "description": "Looking for a developer to prototype retrieval over manuals. We value an evaluation plan, clear citations, and a short delivery report. Budget range $600-$900.",
+    "skills": ["RAG", "Python", "evaluation"],
+    "budget": 750,
+    "connects_cost": 10,
+    "client": "Cobalt Operations",
+    "client_spend": 6800,
+    "posted_at": "2026-11-13T10:00:00Z"
+  }
+]
+
