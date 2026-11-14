@@ -68,7 +68,7 @@ The graph is deliberately small enough to inspect in [`agent/graphs/bid_graph.py
 |---|---|---|
 | Marketplace port | `agent/marketplace_port.py` | Demo adapter works; live adapter intentionally needs OAuth/MCP configuration |
 | MCP | `mcp_servers/portfolio`, `marketplace`, `workspace` | Portfolio server is directly runnable; production auth/rate limiting are documented but not provisioned |
-| Advanced RAG | `rag/variants` and `rag/verify.py` | V0, V1, V2, V3, V4 and V8 interfaces exist; deterministic demo retrieval is not a substitute for a trained reranker |
+| Advanced RAG | `rag/variants` and `rag/verify.py` | V0, V1, V2, V3, V4 and V8 run distinct, deterministic retrieval strategies; they are not substitutes for trained embedding or cross-encoder experiments |
 | Human approval | API approval endpoint and Proposal Studio | Approval creates a dry-run preview only |
 | UI | React/TypeScript dashboard | Inbox, job detail, evidence, approval, and degraded-mode banner are demonstrated |
 | Evaluation | `evals/runners/run_demo_eval.py` | Synthetic smoke data only; GigSim dev/hidden evaluation still requires course assets |
