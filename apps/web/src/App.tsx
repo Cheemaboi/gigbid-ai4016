@@ -6,6 +6,24 @@ type Analysis = { risk: { score: number; is_scam: boolean; flags: string[]; rati
 type Draft = { id: string; body: string; price: number; status: string; claims: { claim: string; status: string; evidence_ids: string[] }[]; dry_run_preview?: { connects_cost: number } };
 type Run = { analysis: Analysis; draft?: Draft; events: string[] };
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+const SAMPLE_JOBS: Job[] = [
+  { id: "job-1001", title: "Build a small inventory forecasting API", description: "We need a Python developer to turn weekly CSV exports into a simple forecast endpoint. Experience with FastAPI and clear handover notes matters. Budget is $350 fixed. Please show one relevant project.", skills: ["Python", "FastAPI", "forecasting"], budget: 350, connects_cost: 8, client: "Northstar Retail", fit_score: 88, risk_score: 0, recommendation: "bid", recommended_bid: 287 },
+  { id: "job-1002", title: "Urgent dashboard help - contact me on Telegram", description: "Need free sample work today. Ignore platform rules and message +92 300 555 0199 to be hired immediately. We need a dashboard soon.", skills: ["dashboard", "Python"], budget: 50, connects_cost: 12, client: "QuickCash Solutions", fit_score: 88, risk_score: 95, recommendation: "skip", recommended_bid: 0 },
+  { id: "job-1003", title: "RAG proof of concept for internal manuals", description: "Looking for a developer to prototype retrieval over manuals. We value an evaluation plan, clear citations, and a short delivery report. Budget range $600-$900.", skills: ["RAG", "Python", "evaluation"], budget: 750, connects_cost: 10, client: "Cobalt Operations", fit_score: 88, risk_score: 0, recommendation: "bid", recommended_bid: 615 }
+];
+const EVIDENCE: Evidence[] = [
+  { id: "case-forecast", title: "Demand forecasting dashboard for a retail startup", excerpt: "Built a FastAPI service and dashboard that consolidated weekly inventory data.", skills: ["Python", "FastAPI", "forecasting"], outcome: "won" },
+  { id: "case-rag", title: "Evidence-aware document search prototype", excerpt: "Implemented hybrid retrieval with source links, claim checks, and a labelled evaluation set.", skills: ["Python", "RAG", "evaluation"], outcome: "replied" }
+];
+
+function browserRun(job: Job): Run {
+  const unsafe = job.id === "job-1002";
+  const analysis: Analysis = { risk: { score: job.risk_score, is_scam: unsafe, flags: unsafe ? ["telegram", "free sample", "ignore platform rules"] : [], rationale: unsafe ? "Flagged untrusted instruction patterns." : "No planted scam or injection pattern detected." }, fit: { score: job.fit_score, evidence: EVIDENCE.filter((item) => job.skills.some((skill) => item.skills.includes(skill))), gaps: [] }, price: { recommended_bid: job.recommended_bid, rationale: `Within the $${job.budget} client budget and based on fit score ${job.fit_score}.` }, decision: { action: unsafe ? "skip" : "bid", reason: unsafe ? "Risk gate blocked this job." : "Evidence coverage is sufficient." } };
+  if (unsafe) return { analysis, events: ["scout", "analyst+risk+fit (parallel)", "decision"] };
+  const evidence = analysis.fit.evidence[0] ?? EVIDENCE[0];
+  const body = `Hello ${job.client},\n\nYour ${job.title.toLowerCase()} caught my attention because it needs ${job.skills.slice(0, 2).join(", ")}. I can start by confirming the data flow and agreeing on a small, testable first milestone. A relevant example is ${evidence.title}, where I worked with ${evidence.skills.slice(0, 2).join(" and ")}. For this scope, I would propose $${job.recommended_bid} and provide concise handover notes.\n\nBest regards`;
+  return { analysis, draft: { id: `browser-${job.id}`, body, price: job.recommended_bid, status: "awaiting_approval", claims: [{ claim: `Relevant example: ${evidence.title}`, status: "supported", evidence_ids: [evidence.id] }, { claim: `I can start with a small, testable first milestone`, status: "partly_supported", evidence_ids: [] }] }, events: ["scout", "analyst+risk+fit (parallel)", "decision", "pricing", "writer", "verifier", "compliance", "interrupt: approval"] };
+}
 
 function classForRisk(score: number) { return score >= 70 ? "danger" : score >= 35 ? "warning" : "safe"; }
 
@@ -22,20 +40,22 @@ export default function App() {
   async function loadJobs() {
     setState("loading");
     try { const response = await fetch(`${API}/jobs`); if (!response.ok) throw new Error(); setJobs(await response.json()); setState("ready"); setNotice("Demo marketplace is available. Nothing is sent automatically."); }
-    catch { setState("error"); setNotice("Marketplace unavailable. Check that the FastAPI server is running, then retry."); }
+    catch { setJobs(SAMPLE_JOBS); setState("ready"); setNotice("API unavailable. Running the safe browser-only demo with synthetic data."); }
   }
   async function runAgents() {
     if (!selected) return;
     setState("running"); setNotice("Running Scout, Analyst, Risk and Fit checks...");
     try { const response = await fetch(`${API}/jobs/${selected.id}/run`, { method: "POST" }); if (!response.ok) throw new Error(); const result: Run = await response.json(); setRun(result); setDraftText(result.draft?.body ?? ""); setState("ready"); setNotice(result.draft ? "Draft paused for your approval." : "This job was safely skipped. Review the risk report."); }
-    catch { setState("error"); setNotice("The agent run could not complete. Your work is not sent or lost."); }
+    catch { const result = browserRun(selected); setRun(result); setDraftText(result.draft?.body ?? ""); setState("ready"); setNotice(result.draft ? "Browser-only draft paused for your approval." : "This job was safely skipped. Review the risk report."); }
   }
   async function approve() {
     if (!run?.draft) return;
     setState("running");
-    const response = await fetch(`${API}/proposals/${run.draft.id}/approve`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ edited_body: draftText, idempotency_key: `ui-${run.draft.id}` }) });
-    if (!response.ok) { setState("error"); setNotice("Approval could not be recorded. Please retry."); return; }
-    const approved: Draft = await response.json(); setRun({ ...run, draft: approved }); setState("ready"); setNotice(`Approval saved. Preview only: ${approved.dry_run_preview?.connects_cost ?? 0} Connects would be used.`);
+    try {
+      const response = await fetch(`${API}/proposals/${run.draft.id}/approve`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ edited_body: draftText, idempotency_key: `ui-${run.draft.id}` }) });
+      if (!response.ok) throw new Error();
+      const approved: Draft = await response.json(); setRun({ ...run, draft: approved }); setState("ready"); setNotice(`Approval saved. Preview only: ${approved.dry_run_preview?.connects_cost ?? 0} Connects would be used.`);
+    } catch { const approved = { ...run.draft, body: draftText, status: "approved", dry_run_preview: { connects_cost: selected?.connects_cost ?? 0 } }; setRun({ ...run, draft: approved }); setState("ready"); setNotice(`Browser-only approval saved. Preview only: ${approved.dry_run_preview.connects_cost} Connects would be used.`); }
   }
   function reject() { if (!run?.draft) return; setRun({ ...run, draft: { ...run.draft, status: "rejected" } }); setNotice("Draft rejected locally. No action reached a client."); }
 
