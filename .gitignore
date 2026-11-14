@@ -12,4 +12,5 @@ starter_reference/
 tmp/
 data/processed/*.sqlite3
 reports/rendered/
+submission/
 
