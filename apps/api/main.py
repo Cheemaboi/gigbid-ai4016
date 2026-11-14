@@ -12,6 +12,7 @@ from agent.marketplace_port import DemoMarketplaceAdapter
 ROOT = Path(__file__).resolve().parents[2]
 JOBS = json.loads((ROOT / "data/processed/demo_jobs.json").read_text(encoding="utf-8"))
 PORTFOLIO = json.loads((ROOT / "data/processed/demo_portfolio.json").read_text(encoding="utf-8"))
+REAL_JOB_SAMPLE = json.loads((ROOT / "data/processed/upwork_jobs_2024_sample.json").read_text(encoding="utf-8"))
 MARKETPLACE = DemoMarketplaceAdapter(JOBS)
 DRAFTS: dict[str, dict] = {}
 AUDIT: list[dict] = []
@@ -41,6 +42,13 @@ def list_jobs():
         result.append({**job, "fit_score": analysis["fit"].score, "risk_score": analysis["risk"].score,
                        "recommendation": analysis["decision"].action, "recommended_bid": analysis["price"].recommended_bid})
     return result
+
+
+@app.get("/research/upwork-2024")
+def research_job_sample(limit: int = 20):
+    """Return attributed public-dataset records without presenting them as a live feed."""
+    limit = max(1, min(limit, 100))
+    return {"metadata": REAL_JOB_SAMPLE["metadata"], "records": REAL_JOB_SAMPLE["records"][:limit]}
 
 @app.get("/jobs/{job_id}")
 def job_detail(job_id: str):
