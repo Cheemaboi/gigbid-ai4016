@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: infra/docker/api.Dockerfile
+    ports: ["8000:8000"]
+    environment:
+      GIGBID_ENV: demo
+      MARKETPLACE_MODE: demo
+    volumes: ["../data:/app/data:ro"]
+  web:
+    build:
+      context: ..
+      dockerfile: infra/docker/web.Dockerfile
+    ports: ["5173:5173"]
+    depends_on: [api]
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["production-services"]
+    environment:
+      POSTGRES_DB: gigbid
+      POSTGRES_USER: gigbid
+      POSTGRES_PASSWORD: change-before-deploying
+  redis:
+    image: redis:7-alpine
+    profiles: ["production-services"]
+
