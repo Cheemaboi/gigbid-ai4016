@@ -34,13 +34,14 @@ export default function App() {
   const [draftText, setDraftText] = useState("");
   const [state, setState] = useState<"loading" | "ready" | "running" | "error">("loading");
   const [notice, setNotice] = useState("Loading locally seeded jobs...");
+  const [connected, setConnected] = useState(false);
 
   const selected = useMemo(() => jobs.find((job) => job.id === selectedId), [jobs, selectedId]);
   useEffect(() => { void loadJobs(); }, []);
   async function loadJobs() {
     setState("loading");
-    try { const response = await fetch(`${API}/jobs`); if (!response.ok) throw new Error(); setJobs(await response.json()); setState("ready"); setNotice("Demo marketplace is available. Nothing is sent automatically."); }
-    catch { setJobs(SAMPLE_JOBS); setState("ready"); setNotice("API unavailable. Running the safe browser-only demo with synthetic data."); }
+    try { const response = await fetch(`${API}/jobs`); if (!response.ok) throw new Error(); setJobs(await response.json()); setConnected(true); setState("ready"); setNotice("Connected to the FastAPI demo service. Nothing is sent automatically."); }
+    catch { setJobs(SAMPLE_JOBS); setConnected(false); setState("ready"); setNotice("API unavailable. This is the browser-only synthetic fallback, not the deployed backend."); }
   }
   async function runAgents() {
     if (!selected) return;
@@ -61,7 +62,7 @@ export default function App() {
 
   return <div className="min-h-[100dvh] bg-[var(--surface)] text-[var(--ink)]">
     <a href="#main" className="skip-link">Skip to content</a>
-    <header className="border-b border-[var(--border)] bg-white"><div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-4 lg:px-8"><div><p className="font-mono text-xs font-bold tracking-[0.16em] text-[var(--primary)]">GIGBID / REVIEW MODE</p><h1 className="text-xl font-semibold tracking-tight">Freelance decisions with receipts.</h1></div><nav aria-label="Primary navigation" className="hidden gap-5 text-sm font-medium text-slate-600 md:flex"><a href="#inbox">Job inbox</a><a href="#studio">Proposal studio</a><a href="#analytics">Analytics</a></nav><span className="rounded-full border border-[var(--border)] bg-blue-50 px-3 py-1 text-xs font-semibold text-[var(--primary)]">Local demo</span></div></header>
+    <header className="border-b border-[var(--border)] bg-white"><div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-4 lg:px-8"><div><p className="font-mono text-xs font-bold tracking-[0.16em] text-[var(--primary)]">GIGBID / REVIEW MODE</p><h1 className="text-xl font-semibold tracking-tight">Freelance decisions with receipts.</h1></div><nav aria-label="Primary navigation" className="hidden gap-5 text-sm font-medium text-slate-600 md:flex"><a href="#inbox">Job inbox</a><a href="#studio">Proposal studio</a><a href="#analytics">Analytics</a></nav><span className={`rounded-full border px-3 py-1 text-xs font-semibold ${connected ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>{connected ? "API connected" : "Browser fallback"}</span></div></header>
     <main id="main" className="mx-auto max-w-[1440px] px-4 py-6 lg:px-8">
       <section aria-live="polite" className={`mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 ${state === "error" ? "border-red-200 bg-red-50 text-red-800" : "border-blue-100 bg-white text-slate-700"}`}><p className="text-sm"><strong>{state === "error" ? "Attention: " : "Status: "}</strong>{notice}</p><button onClick={() => void loadJobs()} className="text-sm font-semibold text-[var(--primary)] underline underline-offset-4">Refresh jobs</button></section>
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.55fr_0.9fr]">
