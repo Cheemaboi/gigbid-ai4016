@@ -88,11 +88,11 @@ These are intentionally left blank until the project owner deploys and publishes
 
 | Deliverable | Link |
 |---|---|
-| Deployed web application | To be added after deployment |
-| Public GitHub repository | To be added after repository publish |
-| Three-minute demo video | To be added after recording |
-| Portfolio MCP server | Source: `mcp_servers/portfolio/server.py`; publish endpoint after hosting |
-| Technical write-up | [`docs/PORTFOLIO_MCP.md`](docs/PORTFOLIO_MCP.md) |
+| Deployed web application | https://cheemaboi.github.io/gigbid-ai4016/ |
+| Public GitHub repository | https://github.com/Cheemaboi/gigbid-ai4016 |
+| Three-minute demo video | Recording still required; follow [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) |
+| Portfolio MCP server | Public source: https://github.com/Cheemaboi/gigbid-ai4016/tree/master/mcp_servers/portfolio; remote hosting still needs an MCP hosting account |
+| Technical write-up | https://github.com/Cheemaboi/gigbid-ai4016/blob/master/docs/PORTFOLIO_MCP.md |
 | R&D report | [`reports/GigBid_RD_Report.pdf`](reports/GigBid_RD_Report.pdf) |
 
 ## Repository map
@@ -110,9 +110,8 @@ These are intentionally left blank until the project owner deploys and publishes
 
 ## Manual actions before submission
 
-1. Push this existing commit history to a new public GitHub repository.
-2. Deploy the web and API, set `VITE_API_URL` for the web client, and replace the delivery links above.
+1. Record the exact walkthrough above. A timed script is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
+2. Publish `mcp_servers/portfolio` on an MCP-capable host using the run command in the technical write-up, then replace the source link with its Streamable HTTP URL.
 3. Set a strong reviewer password from `.env` in the platform's private grading comment only. Never commit it.
-4. Record the exact walkthrough above. A timed script is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
-5. If GigSim/course assets arrive, run the documented larger evaluations and update the report/results rather than reusing the synthetic pilot figures.
+4. If GigSim/course assets arrive, run the documented larger evaluations and update the report/results rather than reusing the synthetic pilot figures.
 
