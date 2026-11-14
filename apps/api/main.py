@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from agent.graphs.bid_graph import analyze, draft
+from agent.graphs.bid_graph import analyze, run_bid_graph as execute_bid_graph
 from agent.marketplace_port import DemoMarketplaceAdapter
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -53,11 +53,13 @@ def job_detail(job_id: str):
 def run_bid_graph(job_id: str):
     try: job = MARKETPLACE.get_job(job_id)
     except KeyError: raise HTTPException(404, "Job not found")
-    result, proposal = draft(job, PORTFOLIO)
-    payload = {"analysis": {key: value.model_dump() for key, value in result.items()}, "events": ["scout", "analyst+risk+fit (parallel)", "decision"]}
+    state = execute_bid_graph(job, PORTFOLIO)
+    result = {key: state[key] for key in ("job_spec", "risk", "fit", "price", "decision")}
+    proposal = state.get("proposal")
+    payload = {"analysis": {key: value.model_dump() for key, value in result.items()}, "events": state["events"]}
     if proposal:
         DRAFTS[proposal.id] = proposal.model_dump()
-        payload.update({"draft": proposal.model_dump(), "events": payload["events"] + ["pricing", "writer", "verifier", "compliance", "interrupt: approval"]})
+        payload.update({"draft": proposal.model_dump(), "events": payload["events"] + ["interrupt: human_approval"]})
     AUDIT.append({"event": "graph_run", "job_id": job_id, "result": result["decision"].action})
     return payload
 

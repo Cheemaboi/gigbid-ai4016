@@ -53,14 +53,14 @@ The committed result at [`evals/results/demo_eval.json`](evals/results/demo_eval
 ## Architecture
 
 ```text
-React reviewer UI -> FastAPI -> hand-written bid graph -> typed handoffs
+React reviewer UI -> FastAPI -> executable LangGraph -> typed handoffs
                                   |          |             |
                            Portfolio MCP  Marketplace MCP  Workspace MCP
                                   |
                         synthetic portfolio evidence
 ```
 
-The graph is deliberately small enough to inspect in [`agent/graphs/bid_graph.py`](agent/graphs/bid_graph.py). Its sequence is Scout -> parallel Job Analyst, Risk Assessor, and Fit Matcher -> decision -> pricing -> writer -> verifier -> compliance -> human approval. The local implementation uses pure Python functions as a deterministic fallback. The interface and typed handoffs were kept ready to map to LangGraph nodes and interrupts when the supplied GigSim environment is available.
+The graph is deliberately small enough to inspect in [`agent/graphs/bid_graph.py`](agent/graphs/bid_graph.py). It is an executable `StateGraph`: Scout fans out to parallel Job Analyst, Risk Assessor, and Fit Matcher nodes, joins at decision, then continues through pricing, writer, verifier, and compliance. LangGraph interrupts before the human-approval node; the separate API endpoint records the reviewer-approved dry-run preview.
 
 ## Requirement coverage
 
@@ -72,7 +72,7 @@ The graph is deliberately small enough to inspect in [`agent/graphs/bid_graph.py
 | Human approval | API approval endpoint and Proposal Studio | Approval creates a dry-run preview only |
 | UI | React/TypeScript dashboard | Inbox, job detail, evidence, approval, and degraded-mode banner are demonstrated |
 | Evaluation | `evals/runners/run_demo_eval.py` | Synthetic smoke data only; GigSim dev/hidden evaluation still requires course assets |
-| Deployment | `infra/docker-compose.yml` | Container configuration included; public hosting and reviewer account require the student's account |
+| Deployment | `render.yaml` and Docker images | Render hosts the full same-origin app/API and the Portfolio MCP server; the static GitHub Pages site is only a browser fallback |
 
 ## Safety decisions
 
@@ -88,10 +88,10 @@ These are intentionally left blank until the project owner deploys and publishes
 
 | Deliverable | Link |
 |---|---|
-| Deployed web application | https://cheemaboi.github.io/gigbid-ai4016/ |
+| Deployed web application | Render deployment is building from `master`; use its assigned `gigbid-api` URL after health check. Static fallback: https://cheemaboi.github.io/gigbid-ai4016/ |
 | Public GitHub repository | https://github.com/Cheemaboi/gigbid-ai4016 |
 | Three-minute demo video | Recording still required; follow [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) |
-| Portfolio MCP server | Public source: https://github.com/Cheemaboi/gigbid-ai4016/tree/master/mcp_servers/portfolio; remote hosting still needs an MCP hosting account |
+| Portfolio MCP server | Render deployment is building from `master`; use its assigned `gigbid-portfolio-mcp` URL plus `/mcp` after health check |
 | Technical write-up | https://github.com/Cheemaboi/gigbid-ai4016/blob/master/docs/PORTFOLIO_MCP.md |
 | R&D report | [`reports/GigBid_RD_Report.pdf`](reports/GigBid_RD_Report.pdf) |
 
@@ -110,8 +110,8 @@ These are intentionally left blank until the project owner deploys and publishes
 
 ## Manual actions before submission
 
-1. Record the exact walkthrough above. A timed script is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
-2. Publish `mcp_servers/portfolio` on an MCP-capable host using the run command in the technical write-up, then replace the source link with its Streamable HTTP URL.
-3. Set a strong reviewer password from `.env` in the platform's private grading comment only. Never commit it.
-4. If GigSim/course assets arrive, run the documented larger evaluations and update the report/results rather than reusing the synthetic pilot figures.
+1. Once Render shows both services live, copy its two real service URLs into this table and test `/health` and `/mcp` before submitting.
+2. Record the exact walkthrough above. A timed script is in [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md).
+3. Add reviewer credentials only to the private GCR comment—not the repository.
+4. Supply the course GigSim assets, then run the documented larger evaluations and update the report/results rather than reusing the synthetic pilot figures.
 
