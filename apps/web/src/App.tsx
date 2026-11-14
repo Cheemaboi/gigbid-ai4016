@@ -35,6 +35,7 @@ export default function App() {
   const [state, setState] = useState<"loading" | "ready" | "running" | "error">("loading");
   const [notice, setNotice] = useState("Loading locally seeded jobs...");
   const [connected, setConnected] = useState(false);
+  const [reviewerToken, setReviewerToken] = useState(() => sessionStorage.getItem("gigbid-reviewer-token") ?? "");
 
   const selected = useMemo(() => jobs.find((job) => job.id === selectedId), [jobs, selectedId]);
   useEffect(() => { void loadJobs(); }, []);
@@ -49,20 +50,37 @@ export default function App() {
     try { const response = await fetch(`${API}/jobs/${selected.id}/run`, { method: "POST" }); if (!response.ok) throw new Error(); const result: Run = await response.json(); setRun(result); setDraftText(result.draft?.body ?? ""); setState("ready"); setNotice(result.draft ? "Draft paused for your approval." : "This job was safely skipped. Review the risk report."); }
     catch { const result = browserRun(selected); setRun(result); setDraftText(result.draft?.body ?? ""); setState("ready"); setNotice(result.draft ? "Browser-only draft paused for your approval." : "This job was safely skipped. Review the risk report."); }
   }
+  async function signIn() {
+    const username = window.prompt("Reviewer username", "reviewer");
+    if (!username) return;
+    const password = window.prompt("Reviewer password (provided privately for grading)");
+    if (!password) return;
+    try {
+      const response = await fetch(`${API}/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
+      if (!response.ok) throw new Error();
+      const session = await response.json() as { access_token: string };
+      sessionStorage.setItem("gigbid-reviewer-token", session.access_token); setReviewerToken(session.access_token); setNotice("Reviewer session active for this browser tab.");
+    } catch { setNotice("Sign-in failed. Check the private reviewer credentials and API connection."); }
+  }
   async function approve() {
     if (!run?.draft) return;
+    if (connected && !reviewerToken) { setNotice("Sign in as reviewer before approving a deployed draft."); return; }
     setState("running");
     try {
-      const response = await fetch(`${API}/proposals/${run.draft.id}/approve`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ edited_body: draftText, idempotency_key: `ui-${run.draft.id}` }) });
+      const response = await fetch(`${API}/proposals/${run.draft.id}/approve`, { method: "POST", headers: { "Content-Type": "application/json", ...(reviewerToken ? { Authorization: `Bearer ${reviewerToken}` } : {}) }, body: JSON.stringify({ edited_body: draftText, idempotency_key: `ui-${run.draft.id}` }) });
       if (!response.ok) throw new Error();
       const approved: Draft = await response.json(); setRun({ ...run, draft: approved }); setState("ready"); setNotice(`Approval saved. Preview only: ${approved.dry_run_preview?.connects_cost ?? 0} Connects would be used.`);
-    } catch { const approved = { ...run.draft, body: draftText, status: "approved", dry_run_preview: { connects_cost: selected?.connects_cost ?? 0 } }; setRun({ ...run, draft: approved }); setState("ready"); setNotice(`Browser-only approval saved. Preview only: ${approved.dry_run_preview.connects_cost} Connects would be used.`); }
+    } catch {
+      setState("ready");
+      if (connected) { setNotice("Approval was not saved by the service. Check your reviewer session and try again."); return; }
+      const approved = { ...run.draft, body: draftText, status: "approved", dry_run_preview: { connects_cost: selected?.connects_cost ?? 0 } }; setRun({ ...run, draft: approved }); setNotice(`Browser-only approval saved. Preview only: ${approved.dry_run_preview.connects_cost} Connects would be used.`);
+    }
   }
   function reject() { if (!run?.draft) return; setRun({ ...run, draft: { ...run.draft, status: "rejected" } }); setNotice("Draft rejected locally. No action reached a client."); }
 
   return <div className="min-h-[100dvh] bg-[var(--surface)] text-[var(--ink)]">
     <a href="#main" className="skip-link">Skip to content</a>
-    <header className="border-b border-[var(--border)] bg-white"><div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-4 lg:px-8"><div><p className="font-mono text-xs font-bold tracking-[0.16em] text-[var(--primary)]">GIGBID / REVIEW MODE</p><h1 className="text-xl font-semibold tracking-tight">Freelance decisions with receipts.</h1></div><nav aria-label="Primary navigation" className="hidden gap-5 text-sm font-medium text-slate-600 md:flex"><a href="#inbox">Job inbox</a><a href="#studio">Proposal studio</a><a href="#analytics">Analytics</a></nav><span className={`rounded-full border px-3 py-1 text-xs font-semibold ${connected ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>{connected ? "API connected" : "Browser fallback"}</span></div></header>
+    <header className="border-b border-[var(--border)] bg-white"><div className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-4 py-4 lg:px-8"><div><p className="font-mono text-xs font-bold tracking-[0.16em] text-[var(--primary)]">GIGBID / REVIEW MODE</p><h1 className="text-xl font-semibold tracking-tight">Freelance decisions with receipts.</h1></div><nav aria-label="Primary navigation" className="hidden gap-5 text-sm font-medium text-slate-600 md:flex"><a href="#inbox">Job inbox</a><a href="#studio">Proposal studio</a><a href="#analytics">Analytics</a></nav><div className="flex items-center gap-2"><span className={`rounded-full border px-3 py-1 text-xs font-semibold ${connected ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-amber-200 bg-amber-50 text-amber-800"}`}>{connected ? "API connected" : "Browser fallback"}</span>{connected && <button onClick={() => void signIn()} className="text-xs font-semibold text-[var(--primary)] underline underline-offset-4">{reviewerToken ? "Reviewer signed in" : "Reviewer sign in"}</button>}</div></div></header>
     <main id="main" className="mx-auto max-w-[1440px] px-4 py-6 lg:px-8">
       <section aria-live="polite" className={`mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 ${state === "error" ? "border-red-200 bg-red-50 text-red-800" : "border-blue-100 bg-white text-slate-700"}`}><p className="text-sm"><strong>{state === "error" ? "Attention: " : "Status: "}</strong>{notice}</p><button onClick={() => void loadJobs()} className="text-sm font-semibold text-[var(--primary)] underline underline-offset-4">Refresh jobs</button></section>
       <div className="grid gap-6 xl:grid-cols-[0.85fr_1.55fr_0.9fr]">
