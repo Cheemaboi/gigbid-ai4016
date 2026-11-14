@@ -16,3 +16,6 @@ dependencies = [
 testpaths = ["tests"]
 pythonpath = ["."]
 
+[tool.setuptools.packages.find]
+include = ["apps*", "agent*", "rag*", "mcp_servers*"]
+
