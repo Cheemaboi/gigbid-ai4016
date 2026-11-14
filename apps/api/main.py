@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+import os
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +16,8 @@ DRAFTS: dict[str, dict] = {}
 AUDIT: list[dict] = []
 
 app = FastAPI(title="GigBid API", version="0.1.0")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173,https://cheemaboi.github.io").split(",") if origin.strip()]
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 
 class ApprovalRequest(BaseModel):
