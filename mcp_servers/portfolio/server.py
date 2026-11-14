@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
+from starlette.responses import JSONResponse
 
 ROOT = Path(__file__).resolve().parents[2]
 PORTFOLIO = json.loads((ROOT / "data/processed/demo_portfolio.json").read_text(encoding="utf-8"))
@@ -23,6 +24,12 @@ mcp = FastMCP(
     port=int(os.getenv("PORT", "8000")),
     transport_security=TransportSecuritySettings(allowed_hosts=allowed_hosts),
 )
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request):
+    """Unauthenticated liveness endpoint for the hosting platform."""
+    return JSONResponse({"status": "ok", "server": "GigBid Portfolio", "transport": os.getenv("MCP_TRANSPORT", "stdio")})
 
 
 @mcp.tool()

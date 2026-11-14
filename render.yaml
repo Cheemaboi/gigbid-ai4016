@@ -15,7 +15,7 @@ services:
     runtime: docker
     dockerfilePath: ./infra/docker/portfolio-mcp.Dockerfile
     dockerContext: .
-    healthCheckPath: /mcp
+    healthCheckPath: /health
     envVars:
       - key: MCP_TRANSPORT
         value: streamable-http
