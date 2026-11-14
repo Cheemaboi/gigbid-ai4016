@@ -6,6 +6,8 @@ node_modules/
 dist/
 coverage/
 .pytest_cache/
+*.egg-info/
+*.tsbuildinfo
 starter_reference/
 tmp/
 data/processed/*.sqlite3
