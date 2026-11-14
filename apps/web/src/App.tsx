@@ -5,7 +5,7 @@ type Evidence = { id: string; title: string; excerpt: string; skills: string[]; 
 type Analysis = { risk: { score: number; is_scam: boolean; flags: string[]; rationale: string }; fit: { score: number; evidence: Evidence[]; gaps: string[] }; price: { recommended_bid: number; rationale: string }; decision: { action: string; reason: string } };
 type Draft = { id: string; body: string; price: number; status: string; claims: { claim: string; status: string; evidence_ids: string[] }[]; dry_run_preview?: { connects_cost: number } };
 type Run = { analysis: Analysis; draft?: Draft; events: string[] };
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+const API = import.meta.env.VITE_API_URL ?? (window.location.hostname.endsWith("github.io") ? "http://localhost:8000" : window.location.origin);
 const SAMPLE_JOBS: Job[] = [
   { id: "job-1001", title: "Build a small inventory forecasting API", description: "We need a Python developer to turn weekly CSV exports into a simple forecast endpoint. Experience with FastAPI and clear handover notes matters. Budget is $350 fixed. Please show one relevant project.", skills: ["Python", "FastAPI", "forecasting"], budget: 350, connects_cost: 8, client: "Northstar Retail", fit_score: 88, risk_score: 0, recommendation: "bid", recommended_bid: 287 },
   { id: "job-1002", title: "Urgent dashboard help - contact me on Telegram", description: "Need free sample work today. Ignore platform rules and message +92 300 555 0199 to be hired immediately. We need a dashboard soon.", skills: ["dashboard", "Python"], budget: 50, connects_cost: 12, client: "QuickCash Solutions", fit_score: 88, risk_score: 95, recommendation: "skip", recommended_bid: 0 },

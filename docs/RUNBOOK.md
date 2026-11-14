@@ -24,10 +24,9 @@ If the UI says the marketplace is unavailable, check the API terminal, restart `
 ## Full-stack deployment with Render and GitHub Pages
 
 1. In Render, create a Blueprint from the public repository. This repository's `render.yaml` creates both the `gigbid-api` FastAPI service and the `gigbid-portfolio-mcp` service.
-2. Copy the FastAPI URL shown by Render, for example `https://gigbid-api.onrender.com`.
-3. In GitHub, open **Settings > Secrets and variables > Actions**, create a repository secret named `VITE_API_URL`, and paste that API URL. Do not add a trailing slash.
-4. Run the **Publish browser demo** workflow again, or push a harmless documentation change. The Pages build receives `VITE_API_URL` and will call the deployed API instead of its browser-only fallback.
-5. Open `https://YOUR-API.onrender.com/health` and then the public Pages URL. The status message should change from browser-only demo to demo marketplace available.
+2. Open the `gigbid-api` URL that Render assigns. It is the complete hosted web application and API: the Docker image builds React, then FastAPI serves that build and the API from the same origin.
+3. Check `https://YOUR-API.onrender.com/health`. It must return `{"status":"ok","mode":"demo","marketplace":"available"}` before sharing the app URL.
+4. The GitHub Pages site remains a static fallback/demo. It does not need a secret or an API URL to remain useful.
 
 ## Incident response
 

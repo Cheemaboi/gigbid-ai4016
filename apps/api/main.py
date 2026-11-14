@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from agent.graphs.bid_graph import analyze, draft
 from agent.marketplace_port import DemoMarketplaceAdapter
@@ -90,4 +91,11 @@ def reject_proposal(draft_id: str, request: RejectionRequest):
 def analytics():
     return {"jobs_scanned": len(JOBS), "drafts": len(DRAFTS), "approved": sum(d["status"] == "approved" for d in DRAFTS.values()),
             "p95_latency_seconds": 0.18, "cost_per_proposal_usd": 0.0, "note": "Offline deterministic demo metrics, not live marketplace outcomes."}
+
+
+# The Render production image builds the React application into this directory.
+# Mounting it last keeps every documented API route above available.
+static_dir = ROOT / "apps" / "web" / "dist"
+if static_dir.exists():
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="web")
 
