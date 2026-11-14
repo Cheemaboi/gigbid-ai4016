@@ -8,7 +8,7 @@
 | Source ZIP | https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_Source_Submission.zip | Public |
 | R&D report PDF | https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_RD_Report.pdf | Public |
 | Technical write-up | https://github.com/Cheemaboi/gigbid-ai4016/blob/master/docs/PORTFOLIO_MCP.md | Public |
-| Portfolio MCP source | https://github.com/Cheemaboi/gigbid-ai4016/tree/master/mcp_servers/portfolio | Public source, remote endpoint pending |
+| Portfolio MCP source | https://github.com/Cheemaboi/gigbid-ai4016/tree/master/mcp_servers/portfolio | Public source; one-click Render Blueprint included |
 | Three-minute demonstration | `docs/DEMO_SCRIPT.md` | Recording/upload pending |
 
 ## Private reviewer comment template

@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: gigbid-portfolio-mcp
+    runtime: docker
+    dockerfilePath: ./infra/docker/portfolio-mcp.Dockerfile
+    dockerContext: .
+    healthCheckPath: /mcp
+    envVars:
+      - key: MCP_TRANSPORT
+        value: streamable-http
+      - key: PUBLIC_HOST
+        sync: false

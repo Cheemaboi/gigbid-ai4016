@@ -1,12 +1,28 @@
 """Portfolio MCP server. Run with: python -m mcp_servers.portfolio.server"""
 from __future__ import annotations
 import json
+import os
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 ROOT = Path(__file__).resolve().parents[2]
 PORTFOLIO = json.loads((ROOT / "data/processed/demo_portfolio.json").read_text(encoding="utf-8"))
-mcp = FastMCP("GigBid Portfolio", instructions="Read-only evidence server for a freelancer portfolio.")
+public_host = os.getenv("PUBLIC_HOST", "").strip()
+allowed_hosts = ["localhost:*", "127.0.0.1:*", "[::1]:*"]
+if public_host:
+    allowed_hosts.append(public_host)
+else:
+    # This server exposes synthetic, read-only course data. Set PUBLIC_HOST in production
+    # to replace this convenience wildcard with the precise deployed hostname.
+    allowed_hosts.append("*.onrender.com")
+mcp = FastMCP(
+    "GigBid Portfolio",
+    instructions="Read-only evidence server for a freelancer portfolio.",
+    host="0.0.0.0" if os.getenv("MCP_TRANSPORT") == "streamable-http" else "127.0.0.1",
+    port=int(os.getenv("PORT", "8000")),
+    transport_security=TransportSecuritySettings(allowed_hosts=allowed_hosts),
+)
 
 
 @mcp.tool()
@@ -41,5 +57,5 @@ def answer_from_portfolio(question: str) -> str:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport=os.getenv("MCP_TRANSPORT", "stdio"))
 
