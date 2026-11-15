@@ -1,5 +1,7 @@
 # Three-minute demo script
 
+The published 180-second narrated recording is available in the [v0.1.0 release](https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_3_Minute_Demo.mp4). This script is retained as the recording outline and verification checklist.
+
 ## 0:00 to 0:20 - framing
 
 Open the dashboard. Say: “GigBid is a safe freelance copilot. It analyses opportunities and prepares evidence-backed drafts, but it never sends a proposal by itself.” Point out the local-demo label.

@@ -90,7 +90,7 @@ These are intentionally left blank until the project owner deploys and publishes
 |---|---|
 | Deployed web application | https://gigbid-api-pn5q.onrender.com (full app/API). Static fallback: https://cheemaboi.github.io/gigbid-ai4016/ |
 | Public GitHub repository | https://github.com/Cheemaboi/gigbid-ai4016 |
-| Three-minute demo video | Recording still required; follow [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) |
+| Three-minute demo video | [180-second narrated deployed-product walkthrough](https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_3_Minute_Demo.mp4) |
 | Portfolio MCP server | https://gigbid-portfolio-mcp.onrender.com/mcp |
 | Technical write-up | https://github.com/Cheemaboi/gigbid-ai4016/blob/master/docs/PORTFOLIO_MCP.md |
 | R&D report | [`reports/GigBid_RD_Report.pdf`](reports/GigBid_RD_Report.pdf) |
