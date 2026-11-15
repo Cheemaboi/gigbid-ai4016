@@ -13,14 +13,14 @@
 
 ## Private reviewer comment template
 
-Use the following only in the private Google Classroom comment after setting a strong deployment password. Do not commit it or paste it into the public repository.
+Use the following only in the private Google Classroom comment. The password is the `REVIEWER_PASSWORD` value held in Render's Environment page; do not commit it or paste it into the public repository.
 
 ```text
 Reviewer login
-URL: [deployment URL]
-Email: [reviewer email]
-Password: [reviewer password]
+URL: https://gigbid-api-pn5q.onrender.com
+Username: reviewer
+Password: [copy REVIEWER_PASSWORD from Render Environment]
 Demo video: [public video URL]
-Portfolio MCP endpoint: [public Streamable HTTP URL]
+Portfolio MCP endpoint: https://gigbid-portfolio-mcp.onrender.com/mcp
 ```
 
