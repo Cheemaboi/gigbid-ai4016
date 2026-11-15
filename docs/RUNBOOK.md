@@ -24,9 +24,10 @@ If the UI says the marketplace is unavailable, check the API terminal, restart `
 ## Full-stack deployment with Render and GitHub Pages
 
 1. In Render, create a Blueprint from the public repository. This repository's `render.yaml` creates both the `gigbid-api` FastAPI service and the `gigbid-portfolio-mcp` service.
-2. Open the `gigbid-api` URL that Render assigns. It is the complete hosted web application and API: the Docker image builds React, then FastAPI serves that build and the API from the same origin.
-3. Check `https://YOUR-API.onrender.com/health`. It must return `{"status":"ok","mode":"demo","marketplace":"available"}` before sharing the app URL.
-4. The GitHub Pages site remains a static fallback/demo. It does not need a secret or an API URL to remain useful.
+2. Open https://gigbid-api-pn5q.onrender.com. It is the complete hosted web application and API: the Docker image builds React, then FastAPI serves that build and the API from the same origin.
+3. Check https://gigbid-api-pn5q.onrender.com/health. It must return `{"status":"ok","mode":"demo","marketplace":"available"}` before sharing the app URL.
+4. The Portfolio MCP endpoint is https://gigbid-portfolio-mcp.onrender.com/mcp. Check its `/health` endpoint before connecting a client.
+5. The GitHub Pages site remains a static fallback/demo. It does not need a secret or an API URL to remain useful.
 
 ## Incident response
 

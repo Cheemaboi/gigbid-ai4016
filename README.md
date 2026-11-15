@@ -88,10 +88,10 @@ These are intentionally left blank until the project owner deploys and publishes
 
 | Deliverable | Link |
 |---|---|
-| Deployed web application | Render deployment is building from `master`; use its assigned `gigbid-api` URL after health check. Static fallback: https://cheemaboi.github.io/gigbid-ai4016/ |
+| Deployed web application | https://gigbid-api-pn5q.onrender.com (full app/API). Static fallback: https://cheemaboi.github.io/gigbid-ai4016/ |
 | Public GitHub repository | https://github.com/Cheemaboi/gigbid-ai4016 |
 | Three-minute demo video | Recording still required; follow [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) |
-| Portfolio MCP server | Render deployment is building from `master`; use its assigned `gigbid-portfolio-mcp` URL plus `/mcp` after health check |
+| Portfolio MCP server | https://gigbid-portfolio-mcp.onrender.com/mcp |
 | Technical write-up | https://github.com/Cheemaboi/gigbid-ai4016/blob/master/docs/PORTFOLIO_MCP.md |
 | R&D report | [`reports/GigBid_RD_Report.pdf`](reports/GigBid_RD_Report.pdf) |
 
