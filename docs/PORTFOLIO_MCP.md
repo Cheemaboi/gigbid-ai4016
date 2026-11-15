@@ -16,14 +16,15 @@ It also exposes `portfolio://case/{case_id}` resources and an `answer_from_portf
 python -m mcp_servers.portfolio.server
 ```
 
-## Publish it on Render
+## Published deployment
 
-The repository now includes `render.yaml` and `infra/docker/portfolio-mcp.Dockerfile`, so this needs only a Render account linked to GitHub, not an API key.
+The public Streamable HTTP endpoint is <https://gigbid-portfolio-mcp.onrender.com/mcp>. `MCP_TRANSPORT=streamable-http` and the Render hostname are configured in `render.yaml`.
 
-1. Sign in at [Render](https://dashboard.render.com/) using GitHub and authorise access to `Cheemaboi/gigbid-ai4016`.
-2. Choose **New** then **Blueprint**, select the repository, and accept the `gigbid-portfolio-mcp` service proposed by `render.yaml`.
-3. In the service Environment page, set `PUBLIC_HOST` to the hostname Render assigns, for example `gigbid-portfolio-mcp.onrender.com`, then deploy once more.
-4. The published endpoint is `https://YOUR-HOST.onrender.com/mcp`. Use that exact URL in MCP Inspector and in the private submission comment.
+Verify a real MCP initialization (rather than a browser GET) with:
 
-`MCP_TRANSPORT=streamable-http` is configured by the Blueprint. It runs the same read-only tools remotely; no browser scraping, secret, or live marketplace data is involved. In a real portfolio deployment, replace the synthetic corpus, add user authentication, and set `PUBLIC_HOST` precisely instead of relying on the safe course-demo fallback.
+```bash
+python scripts/verify_remote_mcp.py
+```
+
+The deployment runs the same read-only tools; no browser scraping, secret, or live marketplace data is involved. In a real portfolio deployment, replace the synthetic corpus and add user authentication and tenant isolation.
 
