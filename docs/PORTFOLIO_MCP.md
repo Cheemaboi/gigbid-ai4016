@@ -18,7 +18,7 @@ python -m mcp_servers.portfolio.server
 
 ## Published deployment
 
-The public Streamable HTTP endpoint is <https://gigbid-portfolio-mcp.onrender.com/mcp>. `MCP_TRANSPORT=streamable-http` and the Render hostname are configured in `render.yaml`.
+The public browser landing page is <https://gigbid-portfolio-mcp.onrender.com>. The Streamable HTTP endpoint for MCP clients is <https://gigbid-portfolio-mcp.onrender.com/mcp>. `MCP_TRANSPORT=streamable-http` and the Render hostname are configured in `render.yaml`. A direct browser visit to `/mcp` returns an HTTP 406 because a browser does not negotiate the MCP event-stream media type; use the landing page or an MCP client instead.
 
 Verify a real MCP initialization (rather than a browser GET) with:
 

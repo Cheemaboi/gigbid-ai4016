@@ -8,7 +8,7 @@
 | Source ZIP | https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_Source_Submission.zip | Public |
 | R&D report PDF | https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_RD_Report.pdf | Public |
 | Technical write-up | https://github.com/Cheemaboi/gigbid-ai4016/blob/master/docs/PORTFOLIO_MCP.md | Public |
-| Portfolio MCP server | https://gigbid-portfolio-mcp.onrender.com/mcp | Live Streamable HTTP endpoint |
+| Portfolio MCP server | https://gigbid-portfolio-mcp.onrender.com | Browser landing page; live Streamable HTTP endpoint at `/mcp` |
 | Three-minute demonstration | https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_3_Minute_Demo.mp4 | Public 180-second narrated walkthrough of the deployed product |
 
 ## Private reviewer comment template
@@ -21,6 +21,7 @@ URL: https://gigbid-api-pn5q.onrender.com
 Username: reviewer
 Password: [copy REVIEWER_PASSWORD from Render Environment]
 Demo video: https://github.com/Cheemaboi/gigbid-ai4016/releases/download/v0.1.0/GigBid_3_Minute_Demo.mp4
-Portfolio MCP endpoint: https://gigbid-portfolio-mcp.onrender.com/mcp
+Portfolio MCP landing page: https://gigbid-portfolio-mcp.onrender.com
+MCP client endpoint: https://gigbid-portfolio-mcp.onrender.com/mcp
 ```
 

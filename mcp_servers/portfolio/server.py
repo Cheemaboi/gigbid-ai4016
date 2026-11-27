@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
-from starlette.responses import JSONResponse
+from starlette.responses import HTMLResponse, JSONResponse
 
 ROOT = Path(__file__).resolve().parents[2]
 PORTFOLIO = json.loads((ROOT / "data/processed/demo_portfolio.json").read_text(encoding="utf-8"))
@@ -30,6 +30,14 @@ mcp = FastMCP(
 async def health_check(request):
     """Unauthenticated liveness endpoint for the hosting platform."""
     return JSONResponse({"status": "ok", "server": "GigBid Portfolio", "transport": os.getenv("MCP_TRANSPORT", "stdio")})
+
+
+@mcp.custom_route("/", methods=["GET"])
+async def landing_page(request):
+    """Human-readable entry point; the MCP protocol itself lives at /mcp."""
+    return HTMLResponse(
+        """<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>GigBid Portfolio MCP</title><style>body{font-family:system-ui,sans-serif;max-width:720px;margin:10vh auto;padding:0 24px;line-height:1.55;color:#172033}code{background:#edf2f7;padding:2px 5px;border-radius:4px}a{color:#1d4ed8}</style></head><body><h1>GigBid Portfolio MCP</h1><p>This is a public, read-only Model Context Protocol server used by GigBid to retrieve portfolio evidence.</p><p><strong>For MCP clients:</strong> connect to <code>/mcp</code> using Streamable HTTP. Opening that protocol URL directly in a browser is not a failure: browsers do not send the required MCP <code>Accept</code> headers.</p><h2>Available tools</h2><ul><li><code>search_evidence</code> — retrieve relevant portfolio evidence</li><li><code>get_case_study</code> — retrieve a case study by ID</li><li><code>list_skills</code> — list portfolio skills</li></ul><p><a href=\"/health\">Health check</a> · <a href=\"https://github.com/Cheemaboi/gigbid-ai4016/blob/master/docs/PORTFOLIO_MCP.md\">Technical write-up</a></p></body></html>"""
+    )
 
 
 @mcp.tool()
